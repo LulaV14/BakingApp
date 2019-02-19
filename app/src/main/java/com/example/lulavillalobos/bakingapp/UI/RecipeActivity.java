@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.lulavillalobos.bakingapp.Model.Recipe;
 import com.example.lulavillalobos.bakingapp.R;
 
 public class RecipeActivity extends AppCompatActivity {
 
     private static final String TAG = RecipeActivity.class.getSimpleName();
+    private StepListFragment stepListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +26,17 @@ public class RecipeActivity extends AppCompatActivity {
                 Log.e(TAG, "No Recipe object serialized");
             }
 
-            //send as bundle
-            Bundle bundle = new Bundle();
-            bundle.putInt("RECIPE_ID", recipe_id);
-            StepListFragment stepListFragment = new StepListFragment();
-            stepListFragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.step_list_fragment_container, stepListFragment).commit();
+            if (savedInstanceState == null) {
+                //set fragment and send recipe_id
+                Bundle bundle = new Bundle();
+                bundle.putInt("RECIPE_ID", recipe_id);
+                stepListFragment = new StepListFragment();
+                stepListFragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction().replace(R.id.step_list_fragment_container, stepListFragment).commit();
+            } else {
+                stepListFragment = (StepListFragment) getSupportFragmentManager()
+                        .getFragment(savedInstanceState, "stepListFragment");
+            }
         } else {
             closeOnError();
             Log.e(TAG, "No intent extra data found");
@@ -45,5 +50,12 @@ public class RecipeActivity extends AppCompatActivity {
                 "Error while trying to view recipe details.\nPlease try again.",
                 Toast.LENGTH_LONG
         ).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //Save fragment's instance
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "stepListFragment", stepListFragment);
     }
 }

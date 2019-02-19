@@ -3,8 +3,8 @@ package com.example.lulavillalobos.bakingapp.UI;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,12 +21,14 @@ import com.example.lulavillalobos.bakingapp.R;
 import com.example.lulavillalobos.bakingapp.ViewModel.RecipeViewModel;
 import com.example.lulavillalobos.bakingapp.ViewModel.RecipeViewModelFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StepListFragment extends Fragment {
 
     private static final String TAG = StepListFragment.class.getSimpleName();
     private int recipe_id;
+    private List<Step> steps;
     private AppDatabase database;
     private RecyclerView recyclerView;
     private StepListAdapter stepListAdapter;
@@ -52,12 +54,6 @@ public class StepListFragment extends Fragment {
 
         database = AppDatabase.getInstance(getContext());
 
-        //get recipe_id from bundle
-        if (getArguments() != null) {
-            recipe_id = getArguments().getInt("RECIPE_ID");
-            setupStepList();
-        }
-
         // TODO: implement onClickListener
 
         return rootView;
@@ -70,10 +66,33 @@ public class StepListFragment extends Fragment {
         viewModel.getRecipe().observe(this, new Observer<Recipe>() {
             @Override
             public void onChanged(@Nullable Recipe recipe) {
-                List<Step> steps = recipe.getSteps();
+                steps = recipe.getSteps();
                 stepListAdapter = new StepListAdapter(steps);
                 recyclerView.setAdapter(stepListAdapter);
             }
         });
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("step_list")) {
+            steps = savedInstanceState.getParcelableArrayList("step_list");
+            stepListAdapter = new StepListAdapter(steps);
+            recyclerView.setAdapter(stepListAdapter);
+        } else {
+            //get recipe_id from bundle
+            if (getArguments() != null) {
+                recipe_id = getArguments().getInt("RECIPE_ID");
+                setupStepList();
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelableArrayList("step_list", (ArrayList<Step>)steps);
+        super.onSaveInstanceState(outState);
     }
 }
