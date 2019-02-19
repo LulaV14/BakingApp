@@ -1,14 +1,20 @@
 package com.example.lulavillalobos.bakingapp.Model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.lulavillalobos.bakingapp.Database.IngredientListConverter;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity (tableName = "recipe")
 public class Recipe implements Parcelable {
+    @PrimaryKey
     @SerializedName("id")
     private Integer id;
 

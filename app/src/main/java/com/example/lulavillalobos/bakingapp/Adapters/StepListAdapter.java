@@ -8,19 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.lulavillalobos.bakingapp.Model.Step;
 import com.example.lulavillalobos.bakingapp.R;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.ViewHolder> {
     private static final String TAG = StepListAdapter.class.getSimpleName();
-    private Integer stepListSize;// TODO: change to ArrayList / List
+    private List<Step> steps;
 
-    public StepListAdapter(Integer stepListSize) {
-        this.stepListSize = stepListSize;
+    public StepListAdapter(List<Step> steps) {
+        this.steps = steps;
     }
 
     @NonNull
@@ -34,16 +35,13 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        if (i == 0) {
-            viewHolder.step_name.setText("Recipe Ingredients");
-        } else {
-            viewHolder.step_name.setText("Recipe Step " + i + "Description");
-        }
+        Step step = steps.get(i);
+        viewHolder.step_name.setText(step.getShortDescription());
     }
 
     @Override
     public int getItemCount() {
-        return stepListSize;
+        return steps.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

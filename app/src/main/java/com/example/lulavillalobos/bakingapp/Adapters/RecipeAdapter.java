@@ -14,6 +14,7 @@ import com.example.lulavillalobos.bakingapp.Model.Recipe;
 import com.example.lulavillalobos.bakingapp.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,9 +22,9 @@ import butterknife.ButterKnife;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> {
     private static final String TAG = RecipeAdapter.class.getSimpleName();
     private final RecipeOnClickHandler recipeOnClickHandler;
-    private ArrayList<Recipe> recipes;
+    private List<Recipe> recipes;
 
-    public RecipeAdapter(ArrayList<Recipe> recipes, RecipeOnClickHandler clickHandler) {
+    public RecipeAdapter(List<Recipe> recipes, RecipeOnClickHandler clickHandler) {
         this.recipes = recipes;
         this.recipeOnClickHandler = clickHandler;
     }
