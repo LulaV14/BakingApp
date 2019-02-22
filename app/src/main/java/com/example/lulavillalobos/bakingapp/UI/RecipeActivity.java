@@ -1,22 +1,41 @@
 package com.example.lulavillalobos.bakingapp.UI;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.lulavillalobos.bakingapp.Database.AppDatabase;
 import com.example.lulavillalobos.bakingapp.Model.Recipe;
 import com.example.lulavillalobos.bakingapp.R;
+import com.example.lulavillalobos.bakingapp.ViewModel.RecipeViewModel;
+import com.example.lulavillalobos.bakingapp.ViewModel.RecipeViewModelFactory;
 
-public class RecipeActivity extends AppCompatActivity {
+public class RecipeActivity extends AppCompatActivity implements StepListFragment.OnStepListClickListener {
 
     private static final String TAG = RecipeActivity.class.getSimpleName();
+    private StepListFragment stepListFragment;
+    private StepDescriptionFragment stepDescriptionFragment;
+    private AppDatabase database;
+    private Recipe recipe;
+    private int step_index;
+    private boolean mTwoPane;
+
+    //TODO: need to add ingredient item (step) textview and
+    //set onclicklistener
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
+
+        database = AppDatabase.getInstance(this);
 
         Intent intent = getIntent();
         if (intent.hasExtra("RECIPE_ID")) {
@@ -26,15 +45,69 @@ public class RecipeActivity extends AppCompatActivity {
                 Log.e(TAG, "No Recipe object serialized");
             }
 
-            //send as bundle
-            Bundle bundle = new Bundle();
-            bundle.putInt("RECIPE_ID", recipe_id);
-            StepListFragment stepListFragment = new StepListFragment();
-            stepListFragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.step_list_fragment_container, stepListFragment).commit();
+            if (savedInstanceState == null) {
+                setupRecipe(recipe_id);
+
+                //check if it's single or two pane and act accordingly
+                if (findViewById(R.id.step_description_fragment_container) != null) {
+                    mTwoPane = true;
+                    stepDescriptionFragment = new StepDescriptionFragment();
+                    stepDescriptionFragment.setStepList(recipe.getSteps());
+                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
+                    stepDescriptionFragment.setIndex(step_index);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(
+                        R.id.step_description_fragment_container,
+                        stepDescriptionFragment,
+                        "stepDescriptionFragment"
+                    );
+                    ft.addToBackStack(null);
+                    ft.commit();
+                } else {
+                    mTwoPane = false;
+                }
+            } else {
+                recipe = savedInstanceState.getParcelable("RECIPE_OBJECT");
+                stepListFragment = (StepListFragment) getSupportFragmentManager()
+                        .getFragment(savedInstanceState, "stepListFragment");
+                stepDescriptionFragment = (StepDescriptionFragment) getSupportFragmentManager()
+                        .getFragment(savedInstanceState, "stepDescriptionFragment");
+            }
         } else {
             closeOnError();
             Log.e(TAG, "No intent extra data found");
+        }
+    }
+
+    @Override
+    public void onStepItemSelected(int position) {
+        step_index = position;
+        if (mTwoPane) {
+            //TODO: add code to handle two pane functionality on step selected
+            //TODO:verify this works
+            stepDescriptionFragment = new StepDescriptionFragment();
+            stepDescriptionFragment.setIngredients(recipe.getIngredients());
+            stepDescriptionFragment.setStepList(recipe.getSteps());
+            stepDescriptionFragment.setIndex(step_index);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(
+                    R.id.step_description_fragment_container,
+                    stepDescriptionFragment,
+                    "stepDescriptionFragment"
+            ).commit();
+        } else {
+            stepDescriptionFragment = new StepDescriptionFragment();
+            stepDescriptionFragment.setIngredients(recipe.getIngredients());
+            stepDescriptionFragment.setStepList(recipe.getSteps());
+            stepDescriptionFragment.setIndex(step_index);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(
+                    R.id.step_list_fragment_container,
+                    stepDescriptionFragment,
+                    "stepDescriptionFragment"
+            );
+            ft.addToBackStack(null);
+            ft.commit();
         }
     }
 
@@ -45,5 +118,51 @@ public class RecipeActivity extends AppCompatActivity {
                 "Error while trying to view recipe details.\nPlease try again.",
                 Toast.LENGTH_LONG
         ).show();
+    }
+
+    public void setupRecipe(int recipe_id) {
+        RecipeViewModelFactory factory = new RecipeViewModelFactory(database, recipe_id);
+        RecipeViewModel viewModel =
+                ViewModelProviders.of(this, factory).get(RecipeViewModel.class);
+        viewModel.getRecipe().observe(this, new Observer<Recipe>() {
+            @Override
+            public void onChanged(@Nullable Recipe recipe) {
+                RecipeActivity.this.recipe = recipe;
+                stepListFragment = new StepListFragment();
+                stepListFragment.setSteps(recipe.getSteps());
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(
+                    R.id.step_list_fragment_container,
+                    stepListFragment,
+                    "stepListFragment"
+                ).commit();
+            }
+        });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //Save fragment's instance
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("RECIPE_OBJECT", recipe);
+        if (stepListFragment != null && stepListFragment.isAdded()) {
+            getSupportFragmentManager().putFragment(outState, "stepListFragment", stepListFragment);
+        }
+
+        if (stepDescriptionFragment != null && stepDescriptionFragment.isAdded()) {
+            getSupportFragmentManager().putFragment(outState, "stepDescriptionFragment", stepDescriptionFragment);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStackImmediate();
+            ft.commit();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

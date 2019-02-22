@@ -18,10 +18,16 @@ import butterknife.ButterKnife;
 
 public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.ViewHolder> {
     private static final String TAG = StepListAdapter.class.getSimpleName();
+    private final OnStepClickListener onStepClickListener;
     private List<Step> steps;
 
-    public StepListAdapter(List<Step> steps) {
+    public StepListAdapter(List<Step> steps, OnStepClickListener clickHandler) {
         this.steps = steps;
+        this.onStepClickListener = clickHandler;
+    }
+
+    public interface OnStepClickListener {
+        void onStepSelected(int step_position);
     }
 
     @NonNull
@@ -44,13 +50,20 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.ViewHo
         return steps.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.tv_step_name)
         TextView step_name;
 
         private ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            onStepClickListener.onStepSelected(getAdapterPosition());
+            // TODO: handle background color change
         }
     }
 }
