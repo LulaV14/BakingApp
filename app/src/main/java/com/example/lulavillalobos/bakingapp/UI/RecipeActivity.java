@@ -3,6 +3,7 @@ package com.example.lulavillalobos.bakingapp.UI;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -37,6 +38,9 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
 
         database = AppDatabase.getInstance(this);
 
+        mTwoPane = (Boolean) (findViewById(R.id.step_description_fragment_container) != null &&
+            getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+
         Intent intent = getIntent();
         if (intent.hasExtra("RECIPE_ID")) {
             int recipe_id = intent.getIntExtra("RECIPE_ID", -1);
@@ -51,18 +55,18 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 //check if it's single or two pane and act accordingly
                 if (findViewById(R.id.step_description_fragment_container) != null) {
                     mTwoPane = true;
-                    stepDescriptionFragment = new StepDescriptionFragment();
-                    stepDescriptionFragment.setStepList(recipe.getSteps());
-                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
-                    stepDescriptionFragment.setIndex(step_index);
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(
-                        R.id.step_description_fragment_container,
-                        stepDescriptionFragment,
-                        "stepDescriptionFragment"
-                    );
-                    ft.addToBackStack(null);
-                    ft.commit();
+//                    stepDescriptionFragment = new StepDescriptionFragment();
+//                    stepDescriptionFragment.setStepList(recipe.getSteps());
+//                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
+//                    stepDescriptionFragment.setIndex(step_index);
+//                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//                    ft.replace(
+//                        R.id.step_description_fragment_container,
+//                        stepDescriptionFragment,
+//                        "stepDescriptionFragment"
+//                    );
+//                    ft.addToBackStack(null);
+//                    ft.commit();
                 } else {
                     mTwoPane = false;
                 }
@@ -128,13 +132,29 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
             @Override
             public void onChanged(@Nullable Recipe recipe) {
                 RecipeActivity.this.recipe = recipe;
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                if (mTwoPane) {
+                    // set step description fragment
+                    stepDescriptionFragment = new StepDescriptionFragment();
+                    stepDescriptionFragment.setStepList(recipe.getSteps());
+                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
+                    stepDescriptionFragment.setIndex(step_index);
+                    ft.replace(
+                            R.id.step_description_fragment_container,
+                            stepDescriptionFragment,
+                            "stepDescriptionFragment"
+                    );
+                    ft.addToBackStack(null);
+//                    ft.commit();
+                }
+
+                // set step list fragment
                 stepListFragment = new StepListFragment();
                 stepListFragment.setSteps(recipe.getSteps());
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(
-                    R.id.step_list_fragment_container,
-                    stepListFragment,
-                    "stepListFragment"
+                        R.id.step_list_fragment_container,
+                        stepListFragment,
+                        "stepListFragment"
                 ).commit();
             }
         });
@@ -156,13 +176,17 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
 
     @Override
     public void onBackPressed() {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStackImmediate();
-            ft.commit();
-        } else {
+        if (mTwoPane) {
             super.onBackPressed();
+        } else {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            if (fm.getBackStackEntryCount() > 0) {
+                fm.popBackStackImmediate();
+                ft.commit();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 }

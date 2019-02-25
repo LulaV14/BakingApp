@@ -44,6 +44,16 @@
                 android:textSize="15sp"
                 android:text="Example Go To Next Step"/>
 
+
+            <Button
+                android:id="@+id/btn_add_to_widget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:textSize="15sp"
+                android:text="Add Recipe Ingredients to Widget"/>
+
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
