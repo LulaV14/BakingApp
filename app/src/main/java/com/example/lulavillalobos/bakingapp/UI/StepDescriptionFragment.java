@@ -1,5 +1,6 @@
 package com.example.lulavillalobos.bakingapp.UI;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import com.example.lulavillalobos.bakingapp.Adapters.IngredientsAdapter;
 import com.example.lulavillalobos.bakingapp.Model.Ingredient;
 import com.example.lulavillalobos.bakingapp.Model.Step;
 import com.example.lulavillalobos.bakingapp.R;
+import com.example.lulavillalobos.bakingapp.Widget.IngredientsWidgetProvider;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -52,6 +54,9 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
     @BindView(R.id.btn_next_step)
     Button btnNextStep;
+
+    @BindView(R.id.btn_add_to_widget)
+    Button btnAddToWidget; //TODO: change
 
     @BindView(R.id.playerView)
     SimpleExoPlayerView playerView;
@@ -90,6 +95,15 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
         setViewData();
         btnNextStep.setOnClickListener(this);
+
+        btnAddToWidget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), IngredientsWidgetProvider.class);
+                intent.setAction(IngredientsWidgetProvider.UPDATE_INGREDIENTS_ACTION);
+                getActivity().sendBroadcast(intent);
+            }
+        });
     }
 
     public void setIngredients(List<Ingredient> ingredients) {
@@ -118,7 +132,7 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             tvStepDescription.setText(selectedStep.getDescription());
             if (mIndex < mSteps.size() - 1) {
                 Step nextStep = mSteps.get(mIndex + 1);
-                btnNextStep.setText("Go To Next Step: " + nextStep.getShortDescription());
+                btnNextStep.setText("Go To Next Step:\n" + nextStep.getShortDescription());
                 btnNextStep.setVisibility(View.VISIBLE);
             } else {
                 btnNextStep.setVisibility(View.GONE);
