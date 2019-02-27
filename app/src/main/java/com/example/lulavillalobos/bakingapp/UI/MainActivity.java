@@ -52,7 +52,13 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
         database = AppDatabase.getInstance(getApplicationContext());
 
-        showRecipes();
+        if (savedInstanceState != null && savedInstanceState.containsKey("recipe_list")) {
+            recipes = savedInstanceState.getParcelableArrayList("recipe_list");
+            recipeAdapter = new RecipeAdapter(recipes, MainActivity.this::onClick);
+            recyclerView.setAdapter(recipeAdapter);
+        } else {
+            showRecipes();
+        }
     }
 
     public void showRecipes() {
@@ -125,5 +131,11 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
                 database.recipeDao().insertRecipe(recipe);
             }
         };
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("recipe_list", (ArrayList<Recipe>)recipes);
+        super.onSaveInstanceState(outState);
     }
 }

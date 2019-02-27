@@ -1,37 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/step_list_fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="5dp">
-
-        <TextView
-            android:id="@+id/tv_step_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Recipe Ingredients"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:paddingLeft="5dp"
-            android:layout_margin="10dp"/>
-
-        <!-- A small divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
-
-        <!-- StepListFragment container -->
-        <FrameLayout
-            android:id="@+id/step_list_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-</ScrollView>
+    android:layout_height="match_parent"/>
