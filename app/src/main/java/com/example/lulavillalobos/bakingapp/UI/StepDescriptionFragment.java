@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +65,9 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
     @BindView(R.id.playerView)
     SimpleExoPlayerView playerView;
+
+    @BindView(R.id.iv_step_image)
+    ImageView ivStepImage;
 
     @BindView(R.id.rv_ingredients_list)
     RecyclerView rvIngredientsList;
@@ -149,6 +154,16 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             } else {
                 btnPreviousStep.setVisibility(View.GONE);
             }
+
+            if (!selectedStep.getThumbnailURL().isEmpty()) {
+                ivStepImage.setVisibility(View.VISIBLE);
+                Picasso.get()
+                        .load(selectedStep.getThumbnailURL())
+                        .into(ivStepImage);
+            } else {
+                ivStepImage.setVisibility(View.GONE);
+            }
+
 
             String videoUrl = selectedStep.getVideoURL();
             releasePlayer();
