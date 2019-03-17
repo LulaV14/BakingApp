@@ -55,6 +55,9 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     @BindView(R.id.btn_next_step)
     Button btnNextStep;
 
+    @BindView(R.id.btn_previous_step)
+    Button btnPreviousStep;
+
     @BindView(R.id.btn_add_to_widget)
     Button btnAddToWidget; //TODO: change
 
@@ -95,6 +98,7 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
         setViewData();
         btnNextStep.setOnClickListener(this);
+        btnPreviousStep.setOnClickListener(this);
 
         btnAddToWidget.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +142,14 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
                 btnNextStep.setVisibility(View.GONE);
             }
 
+            if (mIndex != 0) {
+                Step previousStep = mSteps.get(mIndex - 1);
+                btnPreviousStep.setText("Go To Previous Step:\n" + previousStep.getShortDescription());
+                btnPreviousStep.setVisibility(View.VISIBLE);
+            } else {
+                btnPreviousStep.setVisibility(View.GONE);
+            }
+
             String videoUrl = selectedStep.getVideoURL();
             releasePlayer();
             if (!videoUrl.isEmpty()) {
@@ -160,7 +172,11 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        mIndex++;
+        if (v.getId() == btnNextStep.getId()) {
+            mIndex++;
+        } else {
+            mIndex--;
+        }
         setViewData();
     }
 

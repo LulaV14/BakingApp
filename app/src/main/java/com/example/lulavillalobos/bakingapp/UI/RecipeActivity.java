@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.lulavillalobos.bakingapp.Database.AppDatabase;
@@ -35,6 +36,8 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         database = AppDatabase.getInstance(this);
 
@@ -188,5 +191,21 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 super.onBackPressed();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+
+                } else {
+                    onBackPressed();
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
