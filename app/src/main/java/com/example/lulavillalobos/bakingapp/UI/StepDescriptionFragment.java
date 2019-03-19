@@ -2,6 +2,7 @@ package com.example.lulavillalobos.bakingapp.UI;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -243,12 +244,16 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
+        if (Build.VERSION.SDK_INT < 24) {
+            releasePlayer();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        releasePlayer();
+        if (Build.VERSION.SDK_INT >= 24) {
+            releasePlayer();
+        }
     }
 }
