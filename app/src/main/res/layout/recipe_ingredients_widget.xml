@@ -20,6 +20,6 @@
         style="@android:style/TextAppearance.Medium"
         android:layout_gravity="center"
         android:layout_margin="4dp"
-        android:text="No meeting" />
+        android:text="@string/empty_widget_message" />
 
 </LinearLayout>

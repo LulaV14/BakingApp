@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.lulavillalobos.bakingapp.Database.AppDatabase;
@@ -28,13 +29,12 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
     private int step_index;
     private boolean mTwoPane;
 
-    //TODO: need to add ingredient item (step) textview and
-    //set onclicklistener
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         database = AppDatabase.getInstance(this);
 
@@ -53,23 +53,7 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 setupRecipe(recipe_id);
 
                 //check if it's single or two pane and act accordingly
-                if (findViewById(R.id.step_description_fragment_container) != null) {
-                    mTwoPane = true;
-//                    stepDescriptionFragment = new StepDescriptionFragment();
-//                    stepDescriptionFragment.setStepList(recipe.getSteps());
-//                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
-//                    stepDescriptionFragment.setIndex(step_index);
-//                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//                    ft.replace(
-//                        R.id.step_description_fragment_container,
-//                        stepDescriptionFragment,
-//                        "stepDescriptionFragment"
-//                    );
-//                    ft.addToBackStack(null);
-//                    ft.commit();
-                } else {
-                    mTwoPane = false;
-                }
+                mTwoPane = findViewById(R.id.step_description_fragment_container) != null;
             } else {
                 recipe = savedInstanceState.getParcelable("RECIPE_OBJECT");
                 stepListFragment = (StepListFragment) getSupportFragmentManager()
@@ -87,8 +71,6 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
     public void onStepItemSelected(int position) {
         step_index = position;
         if (mTwoPane) {
-            //TODO: add code to handle two pane functionality on step selected
-            //TODO:verify this works
             stepDescriptionFragment = new StepDescriptionFragment();
             stepDescriptionFragment.setIngredients(recipe.getIngredients());
             stepDescriptionFragment.setStepList(recipe.getSteps());
@@ -188,5 +170,21 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 super.onBackPressed();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+
+                } else {
+                    onBackPressed();
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -78,8 +78,6 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
             // It should be in the same layout used to instantiate the RemoteViews object above
             remoteViews.setEmptyView(R.id.list_view_ingredients, R.id.empty_view);
 
-            //TODO: Do additional processing specific to this app widget
-
             appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);

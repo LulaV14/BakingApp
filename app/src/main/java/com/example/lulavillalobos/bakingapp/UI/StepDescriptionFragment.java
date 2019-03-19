@@ -2,6 +2,7 @@ package com.example.lulavillalobos.bakingapp.UI;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,6 +35,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +50,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     private List<Step> mSteps;
     private int mIndex;
     private SimpleExoPlayer player;
+    private long player_position;
+    private boolean play_when_ready;
     private IngredientsAdapter ingredientsAdapter;
 
     @BindView(R.id.tv_step_description)
@@ -55,11 +60,17 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     @BindView(R.id.btn_next_step)
     Button btnNextStep;
 
+    @BindView(R.id.btn_previous_step)
+    Button btnPreviousStep;
+
     @BindView(R.id.btn_add_to_widget)
     Button btnAddToWidget; //TODO: change
 
     @BindView(R.id.playerView)
     SimpleExoPlayerView playerView;
+
+    @BindView(R.id.iv_step_image)
+    ImageView ivStepImage;
 
     @BindView(R.id.rv_ingredients_list)
     RecyclerView rvIngredientsList;
@@ -91,10 +102,13 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             mIngredients = savedInstanceState.getParcelableArrayList("recipe_ingredients");
             mSteps = savedInstanceState.getParcelableArrayList("step_list");
             mIndex = savedInstanceState.getInt("step_index");
+            player_position = savedInstanceState.getLong("player_position");
+            play_when_ready = savedInstanceState.getBoolean("play_when_ready");
         }
 
         setViewData();
         btnNextStep.setOnClickListener(this);
+        btnPreviousStep.setOnClickListener(this);
 
         btnAddToWidget.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +137,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
         outState.putParcelableArrayList("recipe_ingredients", (ArrayList<Ingredient>) mIngredients);
         outState.putParcelableArrayList("step_list", (ArrayList<Step>) mSteps);
         outState.putInt("step_index", mIndex);
+        outState.putLong("player_position", player_position);
+        outState.putBoolean("play_when_ready", play_when_ready);
         super.onSaveInstanceState(outState);
     }
 
@@ -132,11 +148,32 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             tvStepDescription.setText(selectedStep.getDescription());
             if (mIndex < mSteps.size() - 1) {
                 Step nextStep = mSteps.get(mIndex + 1);
-                btnNextStep.setText("Go To Next Step:\n" + nextStep.getShortDescription());
+                String next_step_title = getString(R.string.next_step_title, nextStep.getShortDescription());
+                btnNextStep.setText(next_step_title);
+
                 btnNextStep.setVisibility(View.VISIBLE);
             } else {
                 btnNextStep.setVisibility(View.GONE);
             }
+
+            if (mIndex != 0) {
+                Step previousStep = mSteps.get(mIndex - 1);
+                String previous_step_title = getString(R.string.previous_step_title, previousStep.getShortDescription());
+                btnPreviousStep.setText(previous_step_title);
+                btnPreviousStep.setVisibility(View.VISIBLE);
+            } else {
+                btnPreviousStep.setVisibility(View.GONE);
+            }
+
+            if (!selectedStep.getThumbnailURL().isEmpty()) {
+                ivStepImage.setVisibility(View.VISIBLE);
+                Picasso.get()
+                        .load(selectedStep.getThumbnailURL())
+                        .into(ivStepImage);
+            } else {
+                ivStepImage.setVisibility(View.GONE);
+            }
+
 
             String videoUrl = selectedStep.getVideoURL();
             releasePlayer();
@@ -160,7 +197,11 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        mIndex++;
+        if (v.getId() == btnNextStep.getId()) {
+            mIndex++;
+        } else {
+            mIndex--;
+        }
         setViewData();
     }
 
@@ -180,12 +221,17 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
                     null,
                     null);
             player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
+            if (player_position != 0 && play_when_ready) {
+                player.seekTo(player_position);
+                player.setPlayWhenReady(play_when_ready);
+            }
         }
     }
 
     private void releasePlayer() {
         if (player != null) {
+            player_position = player.getCurrentPosition();
+            play_when_ready = player.getPlayWhenReady();
             player.stop();
             player.release();
             player = null;
@@ -201,12 +247,16 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
+        if (Build.VERSION.SDK_INT < 24) {
+            releasePlayer();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        releasePlayer();
+        if (Build.VERSION.SDK_INT >= 24) {
+            releasePlayer();
+        }
     }
 }

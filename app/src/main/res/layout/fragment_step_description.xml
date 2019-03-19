@@ -25,6 +25,16 @@
                 android:layout_marginBottom="0dp"
                 android:layout_marginLeft="0dp" />
 
+            <ImageView
+                android:id="@+id/iv_step_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_launcher_background"
+                android:contentDescription="@string/step_image_description"/>
+
             <TextView
                 android:id="@+id/tv_step_description"
                 android:layout_width="match_parent"
@@ -33,7 +43,7 @@
                 android:textStyle="bold"
                 android:textAlignment="viewStart"
                 android:layout_margin="5dp"
-                android:text="Example Step Description"/>
+                android:text="@string/step_description_example"/>
 
             <Button
                 android:id="@+id/btn_next_step"
@@ -42,7 +52,16 @@
                 android:layout_margin="5dp"
                 android:padding="5dp"
                 android:textSize="15sp"
-                android:text="Example Go To Next Step"/>
+                android:text="@string/next_step_example"/>
+
+            <Button
+                android:id="@+id/btn_previous_step"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:textSize="15sp"
+                android:text="@string/previous_step_example"/>
 
 
             <Button
@@ -52,7 +71,7 @@
                 android:layout_margin="5dp"
                 android:padding="5dp"
                 android:textSize="15sp"
-                android:text="Add Recipe Ingredients to Widget"/>
+                android:text="@string/add_widget_example"/>
 
         </LinearLayout>
 
