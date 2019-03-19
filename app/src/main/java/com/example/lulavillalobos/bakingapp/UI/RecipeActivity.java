@@ -58,18 +58,6 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 //check if it's single or two pane and act accordingly
                 if (findViewById(R.id.step_description_fragment_container) != null) {
                     mTwoPane = true;
-//                    stepDescriptionFragment = new StepDescriptionFragment();
-//                    stepDescriptionFragment.setStepList(recipe.getSteps());
-//                    stepDescriptionFragment.setIngredients(recipe.getIngredients());
-//                    stepDescriptionFragment.setIndex(step_index);
-//                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//                    ft.replace(
-//                        R.id.step_description_fragment_container,
-//                        stepDescriptionFragment,
-//                        "stepDescriptionFragment"
-//                    );
-//                    ft.addToBackStack(null);
-//                    ft.commit();
                 } else {
                     mTwoPane = false;
                 }
