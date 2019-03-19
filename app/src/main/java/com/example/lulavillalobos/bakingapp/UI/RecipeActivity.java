@@ -29,9 +29,6 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
     private int step_index;
     private boolean mTwoPane;
 
-    //TODO: need to add ingredient item (step) textview and
-    //set onclicklistener
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +53,7 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
                 setupRecipe(recipe_id);
 
                 //check if it's single or two pane and act accordingly
-                if (findViewById(R.id.step_description_fragment_container) != null) {
-                    mTwoPane = true;
-                } else {
-                    mTwoPane = false;
-                }
+                mTwoPane = findViewById(R.id.step_description_fragment_container) != null;
             } else {
                 recipe = savedInstanceState.getParcelable("RECIPE_OBJECT");
                 stepListFragment = (StepListFragment) getSupportFragmentManager()
@@ -78,8 +71,6 @@ public class RecipeActivity extends AppCompatActivity implements StepListFragmen
     public void onStepItemSelected(int position) {
         step_index = position;
         if (mTwoPane) {
-            //TODO: add code to handle two pane functionality on step selected
-            //TODO:verify this works
             stepDescriptionFragment = new StepDescriptionFragment();
             stepDescriptionFragment.setIngredients(recipe.getIngredients());
             stepDescriptionFragment.setStepList(recipe.getSteps());

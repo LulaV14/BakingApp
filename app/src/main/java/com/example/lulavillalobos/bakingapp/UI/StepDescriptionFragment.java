@@ -148,7 +148,9 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             tvStepDescription.setText(selectedStep.getDescription());
             if (mIndex < mSteps.size() - 1) {
                 Step nextStep = mSteps.get(mIndex + 1);
-                btnNextStep.setText("Go To Next Step:\n" + nextStep.getShortDescription());
+                String next_step_title = getString(R.string.next_step_title, nextStep.getShortDescription());
+                btnNextStep.setText(next_step_title);
+
                 btnNextStep.setVisibility(View.VISIBLE);
             } else {
                 btnNextStep.setVisibility(View.GONE);
@@ -156,7 +158,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
 
             if (mIndex != 0) {
                 Step previousStep = mSteps.get(mIndex - 1);
-                btnPreviousStep.setText("Go To Previous Step:\n" + previousStep.getShortDescription());
+                String previous_step_title = getString(R.string.previous_step_title, previousStep.getShortDescription());
+                btnPreviousStep.setText(previous_step_title);
                 btnPreviousStep.setVisibility(View.VISIBLE);
             } else {
                 btnPreviousStep.setVisibility(View.GONE);
