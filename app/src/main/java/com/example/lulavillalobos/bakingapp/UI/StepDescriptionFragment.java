@@ -49,6 +49,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
     private List<Step> mSteps;
     private int mIndex;
     private SimpleExoPlayer player;
+    private long player_position;
+    private boolean play_when_ready;
     private IngredientsAdapter ingredientsAdapter;
 
     @BindView(R.id.tv_step_description)
@@ -99,6 +101,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
             mIngredients = savedInstanceState.getParcelableArrayList("recipe_ingredients");
             mSteps = savedInstanceState.getParcelableArrayList("step_list");
             mIndex = savedInstanceState.getInt("step_index");
+            player_position = savedInstanceState.getLong("player_position");
+            play_when_ready = savedInstanceState.getBoolean("play_when_ready");
         }
 
         setViewData();
@@ -132,6 +136,8 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
         outState.putParcelableArrayList("recipe_ingredients", (ArrayList<Ingredient>) mIngredients);
         outState.putParcelableArrayList("step_list", (ArrayList<Step>) mSteps);
         outState.putInt("step_index", mIndex);
+        outState.putLong("player_position", player_position);
+        outState.putBoolean("play_when_ready", play_when_ready);
         super.onSaveInstanceState(outState);
     }
 
@@ -211,12 +217,17 @@ public class StepDescriptionFragment extends Fragment implements View.OnClickLis
                     null,
                     null);
             player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
+            if (player_position != 0 && play_when_ready) {
+                player.seekTo(player_position);
+                player.setPlayWhenReady(play_when_ready);
+            }
         }
     }
 
     private void releasePlayer() {
         if (player != null) {
+            player_position = player.getCurrentPosition();
+            play_when_ready = player.getPlayWhenReady();
             player.stop();
             player.release();
             player = null;
